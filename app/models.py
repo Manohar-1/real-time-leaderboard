@@ -7,5 +7,5 @@ class User(Base):
 
     id = Column(Integer, primary_key=True)
     username = Column(String, unique=True)
-    score = Column(Integer, default=0)
+    email = Column(String, unique=True)
 
