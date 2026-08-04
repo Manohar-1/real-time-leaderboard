@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from app.dependencies import get_db
 from app.schemas import UserCreate
 from app.security import verify_password
+from app.auth import create_access_token
 
 
 
@@ -24,9 +25,8 @@ def create_user(user:UserCreate,db: Session = Depends(get_db)):
 @app.post("/login")
 def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
     db_user = crud.authenticate_user(db, user)
-    
     if db_user is None or db_user is False:
         raise HTTPException(status_code=401, detail="Invalid username or password")
-        
-    return {"message": "Login successful"}
+    access_token = create_access_token(data={"sub":db_user.username})    
+    return {"access_token": access_token,"token_type": "bearer"}
     
