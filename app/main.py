@@ -1,4 +1,4 @@
-from fastapi import FastAPI,Depends
+from fastapi import FastAPI,Depends, HTTPException
 from app.database import Base, engine
 from app import models,crud,schemas
 from sqlalchemy.orm import Session
@@ -23,13 +23,10 @@ def create_user(user:UserCreate,db: Session = Depends(get_db)):
 
 @app.post("/login")
 def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
-    db_user = crud.get_user_by_username(db, user.username)
-
-    if not db_user:
-        return {"error": "Invalid username or password"}
+    db_user = crud.authenticate_user(db, user)
     
-    if not verify_password(user.password, db_user.password):
-        return {"error": "Invalid username or password"}
-
+    if db_user is None or db_user is False:
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+        
     return {"message": "Login successful"}
     
