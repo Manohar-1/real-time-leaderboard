@@ -7,6 +7,8 @@ from app.schemas import UserCreate
 from app.security import verify_password
 from app.auth import create_access_token
 
+from app.auth import get_current_user
+
 
 
 app = FastAPI()
@@ -30,3 +32,6 @@ def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
     access_token = create_access_token(data={"sub":db_user.username})    
     return {"access_token": access_token,"token_type": "bearer"}
     
+@app.get("/me")
+def read_current_user(current_user:str = Depends(get_current_user)):
+    return {"username": current_user}
