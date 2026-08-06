@@ -8,3 +8,6 @@ class UserCreate(BaseModel):
 class UserLogin(BaseModel):
     username: str
     password: str
+
+class ScoreUpdate(BaseModel):
+    score:int

@@ -17,6 +17,7 @@ def get_user_by_username(db: Session, username: str):
 
 def authenticate_user(db: Session, user: UserLogin):
     db_user = get_user_by_username(db,user.username)
+    
     if db_user is None:
         return False
 
@@ -24,3 +25,10 @@ def authenticate_user(db: Session, user: UserLogin):
         return None
     
     return db_user
+
+def update_user_score(db: Session, username:str, score:int):
+    user = get_user_by_username(db,username)
+    user.score = score
+    db.commit()
+    db.refresh(user)
+    return user
