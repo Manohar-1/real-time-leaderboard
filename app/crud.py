@@ -12,6 +12,11 @@ def create_user(db: Session, user: schemas.UserCreate):
     db.refresh(db_user)
     return db_user
 
+def get_leaderboard(db: Session):
+    return db.query(models.User)\
+             .order_by(models.User.score.desc())\
+             .all()
+
 def get_user_by_username(db: Session, username: str):
     return db.query(User).filter(User.username==username).first()
 
