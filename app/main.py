@@ -8,8 +8,6 @@ from app.security import verify_password
 from app.auth import create_access_token
 from app.auth import get_current_user
 
-
-
 app = FastAPI()
 
 Base.metadata.create_all(bind=engine)
@@ -31,10 +29,11 @@ def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
     access_token = create_access_token(data={"sub":db_user.username})    
     return {"access_token": access_token,"token_type": "bearer"}
     
-@app.get("/me")
-def read_current_user(current_user:str = Depends(get_current_user)):
-    return {"username": current_user}
+# @app.get("/me")
+# def read_current_user(current_user:str = Depends(get_current_user)):
+#     return {"username": current_user}
 
-@app.post("/update_score")
-def update_score(score_update: schemas.ScoreUpdate, current_user:str = Depends(get_current_user), db: Session = Depends(get_db)):
-    updated_user = crud.update_user_score(db, current_user, score_update.score)
+@app.post("/submit_score")
+def submit_score(score_update: schemas.SubmitScore, current_user:str = Depends(get_current_user), db: Session = Depends(get_db)):
+    updated_user = crud.submit_score(db, current_user, score_update.score)
+    return {"username": updated_user.username, "score": updated_user.score}
