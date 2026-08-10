@@ -38,6 +38,6 @@ def submit_score(score_update: schemas.SubmitScore, current_user:str = Depends(g
     updated_user = crud.submit_score(db, current_user, score_update.score)
     return {"username": updated_user.username, "score": updated_user.score}
 
-@app.get("/leaderboard")
+@app.get("/leaderboard",response_model=list[schemas.LeaderBoardUser])
 def get_leaderboard(db: Session = Depends(get_db)):
     return crud.get_leaderboard(db)
