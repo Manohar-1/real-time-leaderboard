@@ -1,4 +1,4 @@
-from fastapi import FastAPI,Depends, HTTPException
+from fastapi import FastAPI,Depends, HTTPException, Query
 from app.database import Base, engine
 from app import models,crud,schemas
 from sqlalchemy.orm import Session
@@ -39,5 +39,5 @@ def submit_score(score_update: schemas.SubmitScore, current_user:str = Depends(g
     return {"username": updated_user.username, "score": updated_user.score}
 
 @app.get("/leaderboard",response_model=list[schemas.LeaderBoardUser])
-def get_leaderboard(limit:int,offset:int,db: Session = Depends(get_db)):
+def get_leaderboard(limit:int=Query(10,ge=1,le=100),offset:int=Query(0,ge=0),db: Session = Depends(get_db)):
     return crud.get_leaderboard(db,limit,offset)
