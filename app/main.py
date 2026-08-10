@@ -43,7 +43,7 @@ def submit_score(score_update: schemas.SubmitScore, current_user:str = Depends(g
 def get_leaderboard(limit:int=Query(10,ge=1,le=100),offset:int=Query(0,ge=0),db: Session = Depends(get_db)):
     return crud.get_leaderboard(db,limit,offset)
 
-@app.get("/me/rank")
+@app.get("/me/rank",response_model = schemas.UserRank)
 def get_my_rank(db:Session = Depends(get_db), username:str = Depends(get_current_user)):
     user_score = crud.get_user_score(db,username)
     rank = crud.get_user_rank(db,user_score)

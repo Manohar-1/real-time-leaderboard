@@ -15,3 +15,8 @@ class SubmitScore(BaseModel):
 class LeaderBoardUser(BaseModel):
     username: str
     score: int
+
+class UserRank(BaseModel):
+    username:str
+    score:int
+    rank:int
