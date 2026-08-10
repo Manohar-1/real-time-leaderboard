@@ -32,6 +32,7 @@ def verify_access_token(token:str):
 
 def get_current_user(token: HTTPAuthorizationCredentials = Depends(bearer_scheme)):
     username = verify_access_token(token.credentials)
+    print(username)
     if username is None:
         raise HTTPException(status_code=401, detail="Invalid token")
 

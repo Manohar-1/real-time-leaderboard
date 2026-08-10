@@ -9,6 +9,12 @@ class UserLogin(BaseModel):
     username: str
     password: str
 
+class UserProfile(BaseModel):
+    username: str
+    email: str
+    score: int
+    rank: int
+
 class SubmitScore(BaseModel):
     score:int
 
