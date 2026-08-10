@@ -13,7 +13,8 @@ app = FastAPI()
 Base.metadata.create_all(bind=engine)
 
 @app.get("/")
-def hello_world():
+def hello_world(db: Session = Depends(get_db)):
+    # print(crud.get_user_score(db,username="rahul"))
     return "Hello, World!"
 
 
@@ -41,3 +42,9 @@ def submit_score(score_update: schemas.SubmitScore, current_user:str = Depends(g
 @app.get("/leaderboard",response_model=list[schemas.LeaderBoardUser])
 def get_leaderboard(limit:int=Query(10,ge=1,le=100),offset:int=Query(0,ge=0),db: Session = Depends(get_db)):
     return crud.get_leaderboard(db,limit,offset)
+
+@app.get("/me/rank")
+def get_my_rank(db:Session = Depends(get_db), username:str = Depends(get_current_user)):
+    user_score = crud.get_user_score(db,username)
+    rank = crud.get_user_rank(db,user_score)
+    return {"username": username, "score": user_score, "rank": rank}
