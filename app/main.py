@@ -57,3 +57,7 @@ def get_my_profile(db:Session = Depends(get_db), username:str = Depends(get_curr
         raise HTTPException(status_code=404, detail="User not found")
     rank = crud.get_user_rank(db,user.score)
     return {"username": user.username, "email": user.email, "score": user.score, "rank": rank}
+
+@app.delete("/users/delete")
+def delete_user(current_user:str = Depends(get_current_user), db: Session = Depends(get_db)):
+    return crud.delete_user(db,current_user)

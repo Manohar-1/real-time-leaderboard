@@ -53,3 +53,11 @@ def submit_score(db: Session, username:str, score:int):
     db.commit()
     db.refresh(user)
     return user
+
+def delete_user(db: Session, username:str):
+    user = get_user_by_username(db,username)
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    db.delete(user)
+    db.commit()
+    return {"message": f"account with username {username} deleted successfully"}
