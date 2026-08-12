@@ -61,3 +61,7 @@ def get_my_profile(db:Session = Depends(get_db), username:str = Depends(get_curr
 @app.delete("/users/delete")
 def delete_user(current_user:str = Depends(get_current_user), db: Session = Depends(get_db)):
     return crud.delete_user(db,current_user)
+
+@app.put("/users/update")
+def update_user(user_update: schemas.UserUpdate, username:str = Depends(get_current_user), db: Session = Depends(get_db)):
+    return crud.update_user(user_update, username,db)

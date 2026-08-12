@@ -26,3 +26,7 @@ class UserRank(BaseModel):
     username:str
     score:int
     rank:int
+
+class UserUpdate(BaseModel):
+    email: str | None = None
+    password: str | None = None

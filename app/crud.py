@@ -61,3 +61,18 @@ def delete_user(db: Session, username:str):
     db.delete(user)
     db.commit()
     return {"message": f"account with username {username} deleted successfully"}
+
+def update_user(user_data: schemas.UserUpdate, username:str, db: Session):
+    user = get_user_by_username(db,username)
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if user_data.email is not None:
+        user.email = user_data.email
+    
+    if user_data.password is not None:
+        user.password = hash_password(user_data.password)
+    
+    db.commit()
+    db.refresh(user)
+    return user
