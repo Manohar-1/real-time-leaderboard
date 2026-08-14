@@ -7,10 +7,13 @@ from app.schemas import UserCreate
 from app.security import verify_password
 from app.auth import create_access_token
 from app.auth import get_current_user
+from app.redis_client import redis_client
 
 app = FastAPI()
 
+#tells SQLAlchemy to create all the database tables defined by your models in the database connected through engine, if they don't already exist.
 Base.metadata.create_all(bind=engine)
+
 
 @app.get("/")
 def hello_world(db: Session = Depends(get_db)):
