@@ -12,24 +12,26 @@ def create_user(db: Session, user: schemas.UserCreate):
     db.refresh(db_user)
     return db_user
 
-def get_leaderboard(db: Session,limit:int,offset:int):
-    return db.query(models.User).order_by(models.User.score.desc()).offset(offset).limit(limit).all()
+# def get_leaderboard(db: Session,limit:int,offset:int):
+#     return db.query(models.User).order_by(models.User.score.desc()).offset(offset).limit(limit).all()
 
 def get_user_by_username(db: Session, username: str):
     return db.query(User).filter(User.username==username).first()
 
 
-def get_user_score(db:Session, username:str):
-    user = get_user_by_username(db,username)
-    if user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    return user.score
+# def get_user_score(db:Session, username:str):
+#     user = get_user_by_username(db,username)
+#     if user is None:
+#         raise HTTPException(status_code=404, detail="User not found")
+#     return user.score
 
+def get_user_game_score(db:Session, user_id:int, game:str):
+    return db.query(models.Score).filter(models.Score.user_id==user_id, models.Score.game==game).first()
 
-def get_user_rank(db:Session, score:int):
-    higher_score_count = db.query(User).filter(User.score > score).count()
-    rank = higher_score_count + 1
-    return rank
+# def get_user_rank(db:Session, score:int):
+#     higher_score_count = db.query(User).filter(User.score > score).count()
+#     rank = higher_score_count + 1
+#     return rank
 
 def authenticate_user(db: Session, user: UserLogin):
     db_user = get_user_by_username(db,user.username)
@@ -42,17 +44,23 @@ def authenticate_user(db: Session, user: UserLogin):
     
     return db_user
 
-def submit_score(db: Session, username:str, score:int):
-    user = get_user_by_username(db,username)
 
-    if user is None:
-        raise HTTPException(status_code=404, detail="User not found")
 
-    if(score>user.score):
-        user.score = score
-    db.commit()
-    db.refresh(user)
-    return user
+def submit_score(db:Session, user_id:int, game:str, score:int):
+    existing_score = get_user_game_score(db, user_id, game)
+    
+    if existing_score:
+        if score > existing_score.score:
+            existing_score.score = score
+            db.commit()
+            db.refresh(existing_score)
+        return existing_score
+    else:
+        new_score = models.Score(user_id=user_id, game=game, score=score)
+        db.add(new_score)
+        db.commit()
+        db.refresh(new_score)
+        return new_score
 
 def delete_user(db: Session, username:str):
     user = get_user_by_username(db,username)
