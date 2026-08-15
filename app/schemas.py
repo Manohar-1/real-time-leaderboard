@@ -16,8 +16,7 @@ class UserProfile(BaseModel):
     score: int
     rank: int
 
-class SubmitScore(BaseModel):
-    score:int
+
 
 class ScoreCreate(BaseModel):
     game : GameType
@@ -27,9 +26,9 @@ class GameType(str, Enum):
     CHESS = "chess"
     FOOTBALL = "football"
 
-class LeaderBoardUser(BaseModel):
-    username: str
-    score: int
+# class LeaderBoardUser(BaseModel):
+#     username: str
+#     score: int
 
 class UserRank(BaseModel):
     username:str
