@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship
+from datetime import datetime
 
 from app.database import Base
 
@@ -17,9 +18,7 @@ class User(Base):
 class Score(Base):
     __tablename__ = "scores"
 
-     __table_args__ = (
-        UniqueConstraint("user_id", "game", name="unique_user_game"),
-    )
+    __table_args__ = (UniqueConstraint("user_id", "game", name="unique_user_game"),)
 
     id= Column(Integer, primary_key=True)
     user_id = Column(Integer,ForeignKey('users.id'),nullable=False)

@@ -25,6 +25,8 @@ def get_user_score(db:Session, username:str):
         raise HTTPException(status_code=404, detail="User not found")
     return user.score
 
+def get_user_game_score(db:Session, user_id:int, game:str):
+    return db.query(models.Score).filter(models.Score.user_id==user_id, models.Score.game==game).first()
 
 def get_user_rank(db:Session, score:int):
     higher_score_count = db.query(User).filter(User.score > score).count()
@@ -53,6 +55,22 @@ def submit_score(db: Session, username:str, score:int):
     db.commit()
     db.refresh(user)
     return user
+
+def submit_score(db:Session, user_id:int, game:str, score:int):
+    existing_score = get_user_game_score(db, user_id, game)
+    
+    if existing_score:
+        if score > existing_score.score:
+            existing_score.score = score
+            db.commit()
+            db.refresh(existing_score)
+        return existing_score
+    else:
+        new_score = models.Score(user_id=user_id, game=game, score=score)
+        db.add(new_score)
+        db.commit()
+        db.refresh(new_score)
+        return new_score
 
 def delete_user(db: Session, username:str):
     user = get_user_by_username(db,username)

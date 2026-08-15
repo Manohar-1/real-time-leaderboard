@@ -39,6 +39,14 @@ def submit_score(score_update: schemas.SubmitScore, current_user:str = Depends(g
     updated_user = crud.submit_score(db, current_user, score_update.score)
     return {"username": updated_user.username, "score": updated_user.score}
 
+@app.post("/submit_score_new")
+def submit_score(score_update: schemas.ScoreCreate, current_user:str = Depends(get_current_user), db: Session = Depends(get_db)):
+    user = crud.get_user_by_username(db,current_user)
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    updated_score = crud.submit_score(db, user.id, score_update.game, score_update.score)
+    return {"username": user.username, "game": score_update.game, "score": updated_score.score}
+
 @app.get("/leaderboard",response_model=list[schemas.LeaderBoardUser])
 def get_leaderboard(limit:int=Query(10,ge=1,le=100),offset:int=Query(0,ge=0),db: Session = Depends(get_db)):
     return crud.get_leaderboard(db,limit,offset)
