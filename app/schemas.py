@@ -18,6 +18,14 @@ class UserProfile(BaseModel):
 class SubmitScore(BaseModel):
     score:int
 
+class ScoreCreate(BaseModel):
+    game : GameType
+    score:int
+
+class GameType(str, Enum):
+    CHESS = "chess"
+    FOOTBALL = "football"
+
 class LeaderBoardUser(BaseModel):
     username: str
     score: int
