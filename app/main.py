@@ -18,6 +18,7 @@ Base.metadata.create_all(bind=engine)
 @app.get("/")
 def hello_world(db: Session = Depends(get_db)):
     # print(crud.get_user_score(db,username="rahul"))
+    print(crud.get_user_aggregate_score(db, user_id=1))
     return "Hello, World!"
 
 

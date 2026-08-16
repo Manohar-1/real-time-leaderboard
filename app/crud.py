@@ -84,3 +84,7 @@ def update_user(user_data: schemas.UserUpdate, username:str, db: Session):
     db.commit()
     db.refresh(user)
     return user
+
+def get_user_aggregate_score(db: Session, user_id: int):
+    total_score = db.query(models.Score).filter(models.Score.user_id == user_id).all()
+    return sum(score.score for score in total_score)
