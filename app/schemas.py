@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from enum import Enum
 
 class UserCreate(BaseModel):
     username: str
@@ -15,12 +16,19 @@ class UserProfile(BaseModel):
     score: int
     rank: int
 
-class SubmitScore(BaseModel):
+
+
+class ScoreCreate(BaseModel):
+    game : GameType
     score:int
 
-class LeaderBoardUser(BaseModel):
-    username: str
-    score: int
+class GameType(str, Enum):
+    CHESS = "chess"
+    FOOTBALL = "football"
+
+# class LeaderBoardUser(BaseModel):
+#     username: str
+#     score: int
 
 class UserRank(BaseModel):
     username:str
