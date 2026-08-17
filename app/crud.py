@@ -3,6 +3,7 @@ from app import models, schemas
 from app.security import hash_password,verify_password
 from app.models import User
 from app.schemas import UserLogin
+from app.redis_client import redis_client
 
 
 def create_user(db: Session, user: schemas.UserCreate):
@@ -54,14 +55,18 @@ def submit_score(db:Session, user_id:int, game:str, score:int):
             existing_score.score = score
             db.commit()
             db.refresh(existing_score)
-        return existing_score
     else:
         new_score = models.Score(user_id=user_id, game=game, score=score)
         db.add(new_score)
         db.commit()
         db.refresh(new_score)
-        return new_score
 
+    aggregate_score = get_user_aggregate_score(db, user_id)
+    redis_client.zadd('global_leaderboard',{str(user_id):aggregate_score})
+    return get_user_game_score(db,user_id, game)
+
+
+    
 def delete_user(db: Session, username:str):
     user = get_user_by_username(db,username)
     if user is None:
