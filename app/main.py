@@ -7,14 +7,18 @@ from app.schemas import UserCreate
 from app.security import verify_password
 from app.auth import create_access_token
 from app.auth import get_current_user
+from app.redis_client import redis_client
 
 app = FastAPI()
 
+#tells SQLAlchemy to create all the database tables defined by your models in the database connected through engine, if they don't already exist.
 Base.metadata.create_all(bind=engine)
+
 
 @app.get("/")
 def hello_world(db: Session = Depends(get_db)):
     # print(crud.get_user_score(db,username="rahul"))
+    print(crud.get_user_aggregate_score(db, user_id=1))
     return "Hello, World!"
 
 
@@ -45,11 +49,17 @@ def submit_score(score_update: schemas.ScoreCreate, current_user:str = Depends(g
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
     updated_score = crud.submit_score(db, user.id, score_update.game, score_update.score)
-    return {"username": user.username, "game": score_update.game, "score": updated_score.score}
+    return {"username": user.username, "game": score_update.game, "best_score": updated_score.score}
 
 # @app.get("/leaderboard",response_model=list[schemas.LeaderBoardUser])
 # def get_leaderboard(limit:int=Query(10,ge=1,le=100),offset:int=Query(0,ge=0),db: Session = Depends(get_db)):
 #     return crud.get_leaderboard(db,limit,offset)
+
+@app.get("/leaderboard")
+def get_leaderboard(db:Session = Depends(get_db)):
+    return crud.get_leaderboard_users(db)
+
+    
 
 # @app.get("/me/rank",response_model = schemas.UserRank)
 # def get_my_rank(db:Session = Depends(get_db), username:str = Depends(get_current_user)):
