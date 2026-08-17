@@ -93,3 +93,18 @@ def update_user(user_data: schemas.UserUpdate, username:str, db: Session):
 def get_user_aggregate_score(db: Session, user_id: int):
     total_score = db.query(models.Score).filter(models.Score.user_id == user_id).all()
     return sum(score.score for score in total_score)
+
+
+def get_leaderboard():
+    return redis_client.zrevrange("global_leaderboard",0,9,withscores=True)
+
+def get_leaderboard_users(db:Session):
+    leaderboard = get_leaderboard()
+    
+    result = []
+
+    for user_id, score in leaderboard:
+        user = db.query(models.User).filter(models.User.id == int(user_id)).first()
+        if user:
+            result.append({"username":user.username,"score":int(score)})
+    return result
