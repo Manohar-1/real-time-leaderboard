@@ -48,6 +48,9 @@ def authenticate_user(db: Session, user: UserLogin):
 
 
 def submit_score(db:Session, user_id:int, game:str, score:int):
+    user = crud.get_user_by_username(db,current_user)
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
     existing_score = get_user_game_score(db, user_id, game)
     
     if existing_score:

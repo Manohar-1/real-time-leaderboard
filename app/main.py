@@ -45,11 +45,8 @@ def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
 
 @app.post("/submit_score_new")
 def submit_score(score_update: schemas.ScoreCreate, current_user:str = Depends(get_current_user), db: Session = Depends(get_db)):
-    user = crud.get_user_by_username(db,current_user)
-    if user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    updated_score = crud.submit_score(db, user.id, score_update.game, score_update.score)
-    return {"username": user.username, "game": score_update.game, "best_score": updated_score.score}
+    updated_score = crud.submit_score(db, current_user, score_update.game, score_update.score)
+    return {"username": current_user, "game": score_update.game, "best_score": updated_score.score}
 
 # @app.get("/leaderboard",response_model=list[schemas.LeaderBoardUser])
 # def get_leaderboard(limit:int=Query(10,ge=1,le=100),offset:int=Query(0,ge=0),db: Session = Depends(get_db)):
@@ -67,14 +64,14 @@ def get_leaderboard(db:Session = Depends(get_db)):
 #     rank = crud.get_user_rank(db,user_score)
 #     return {"username": username, "score": user_score, "rank": rank}
 
-@app.get("/me/profile",response_model = schemas.UserProfile)
-def get_my_profile(db:Session = Depends(get_db), username:str = Depends(get_current_user)):
-    print(username)
-    user = crud.get_user_by_username(db,username)
-    if user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    rank = crud.get_user_rank(db,user.score)
-    return {"username": user.username, "email": user.email, "score": user.score, "rank": rank}
+# @app.get("/me/profile",response_model = schemas.UserProfile)
+# def get_my_profile(db:Session = Depends(get_db), username:str = Depends(get_current_user)):
+#     print(username)
+#     user = crud.get_user_by_username(db,username)
+#     if user is None:
+#         raise HTTPException(status_code=404, detail="User not found")
+#     rank = crud.get_user_rank(db,user.score)
+#     return {"username": user.username, "email": user.email, "score": user.score, "rank": rank}
 
 @app.delete("/users/delete")
 def delete_user(current_user:str = Depends(get_current_user), db: Session = Depends(get_db)):
