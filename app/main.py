@@ -58,11 +58,14 @@ def get_leaderboard(db:Session = Depends(get_db)):
 
     
 
-# @app.get("/me/rank",response_model = schemas.UserRank)
-# def get_my_rank(db:Session = Depends(get_db), username:str = Depends(get_current_user)):
-#     user_score = crud.get_user_score(db,username)
-#     rank = crud.get_user_rank(db,user_score)
-#     return {"username": username, "score": user_score, "rank": rank}
+@app.get("/me/rank",response_model = schemas.UserRank)
+def get_my_rank(db:Session = Depends(get_db), username:str = Depends(get_current_user)):
+    user = crud.get_user_by_username(db,username)
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    rank = crud.get_user_rank(user.id)
+    return {"username": user.username,"score":crud.get_user_aggregate_score(db,user.id), "rank": rank}
 
 # @app.get("/me/profile",response_model = schemas.UserProfile)
 # def get_my_profile(db:Session = Depends(get_db), username:str = Depends(get_current_user)):

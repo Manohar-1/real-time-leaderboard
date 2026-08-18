@@ -47,11 +47,11 @@ def authenticate_user(db: Session, user: UserLogin):
 
 
 
-def submit_score(db:Session, user_id:int, game:str, score:int):
+def submit_score(db:Session, current_user:str, game:str, score:int):
     user = crud.get_user_by_username(db,current_user)
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
-    existing_score = get_user_game_score(db, user_id, game)
+    existing_score = get_user_game_score(db, user.id, game)
     
     if existing_score:
         if score > existing_score.score:
@@ -101,13 +101,23 @@ def get_user_aggregate_score(db: Session, user_id: int):
 def get_leaderboard():
     return redis_client.zrevrange("global_leaderboard",0,9,withscores=True)
 
+
+def get_user_rank(user_id:int):
+    redis_rank = redis_client.zrevrank("global_leaderboard", str(user_id))
+    
+
+
+    if redis_rank is not None:
+        return redis_rank + 1
+    return None
+
 def get_leaderboard_users(db:Session):
     leaderboard = get_leaderboard()
     
     result = []
 
-    for user_id, score in leaderboard:
+    for rank, (user_id, score) in enumerate(leaderboard,start=1):
         user = db.query(models.User).filter(models.User.id == int(user_id)).first()
         if user:
-            result.append({"username":user.username,"score":int(score)})
+            result.append({"rank":rank,"username":user.username,"score":int(score)})
     return result
